@@ -3,7 +3,7 @@ ENV TZ=UTC
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata && \
     rm -rf /var/lib/apt/lists/*
-RUN apt-get update && apt-get install -y sudo
+RUN apt-get update && apt-get install -y sudo curl
 COPY my-script.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/my-script.sh
 RUN /usr/local/bin/my-script.sh
@@ -13,3 +13,6 @@ RUN sudo chmod -R 777 /var/www/html
 COPY info.php /var/www/html/
 EXPOSE 80
 CMD service php8.1-fpm start && nginx -g "daemon off;"
+HEALTHCHECK --interval=5s --timeout=3s \
+      CMD curl -f http://localhost:80/info.php || exit 1
+
